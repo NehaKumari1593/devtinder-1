@@ -3,25 +3,21 @@ const {adminAuth,userAuth}=require("./middlewares.js/auth.js")
 const app=express()
 
 
-
-app.get("/user",userAuth,(req,res)=>{
-  res.send("welcome user ")
+app.get("/",(req,res)=>{
+  // try{
+  throw new Error("errrror")
+ res.send("res send")
+  // }
+  // catch(err)
+  // {
+    res.send("something went wrong 1")
+  // }
 })
+app.use("/",(err,req,res,next)=>{
+ if(err){
+  res.status(500).send("something went wrong")
+ }
 
-
-app.post("/login",(req,res)=>{
-  res.send("logged in succesfully")
-})
-
-app.use("/admin",adminAuth)
-
-app.get("/admin/getAllData",(req,res)=>{
-  res.send("data is send ")
-})
-app.get("/admin/deleteTheUser",(req,res)=>{
- 
-  res.send("user is deleted")
-  
 })
 
 
