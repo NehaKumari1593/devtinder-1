@@ -7,19 +7,46 @@ const { connect } = require("mongoose")
 const app=express()
 app.use(express.json())
 
-app.post("/signup",async(req,res)=>{
-  console.log(req.body)
-const user=new User(req.body)
-    try{
-      await user.save()
-      res.send("use logged in succesfully")
-    }
-    catch{
-      res.send("something wrong")
-    }
-   
 
-  
+//  --------------------.findOne({})----------------
+// app.get("/user",async (req,res)=>{
+//   const email=req.body.email
+//   const user =await User.findOne({email:email})
+//   if(!user)
+//   {
+//     res.send("user not found")
+//   }
+//   else{
+//     res.send(user)
+//   }
+// })
+
+ //--------------------.find({one})----------------
+app.get("/user", async (req,res)=>{
+  const email=req.body.email
+     const user=await User.find()
+     if(user.length===0)
+     {
+      res.send("user notfound")
+     }
+     else{
+      res.send(user)
+
+     }
+})
+
+
+//--------------------.find({})----------------
+app.get("/users", async (req,res)=>{
+  const users=await User.find({})
+  if(users.length===0)
+  {
+   res.send("not user")
+  }
+  else{
+   res.send(users)
+  }
+
 })
 
 
