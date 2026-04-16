@@ -1,26 +1,38 @@
-const express =require("express")
-const {adminAuth,userAuth}=require("./middlewares.js/auth.js")
+const express=require("express")
+const User= require("./models/user.js")
+const  connectDB=require("./config/database.js")
+const { connect } = require("mongoose")
+
 const app=express()
+app.post("/signup",async(req,res)=>{
 
-
-app.get("/",(req,res)=>{
-  // try{
-  throw new Error("errrror")
- res.send("res send")
-  // }
-  // catch(err)
-  // {
-    res.send("something went wrong 1")
-  // }
+  const user=new User({
+    
+    firstName:"neha",
+    lastName:"kumari",
+    email:"neha@gmail.com",
+    password:"aaa",
+    "age":22
+  })
+ 
+try{
+  await user.save()
+  res.send("logged in succesfully")}
+  catch(err){
+    res.send("user is not Logged in ")
+  }
 })
-app.use("/",(err,req,res,next)=>{
- if(err){
-  res.status(500).send("something went wrong")
- }
-
-})
 
 
-
-
+connectDB().then(()=>{
 app.listen(7777)
+}).catch((err)=>{
+console.log("db not connected")
+})
+
+
+
+
+
+
+
