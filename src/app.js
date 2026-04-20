@@ -8,33 +8,26 @@ const app=express()
 app.use(express.json())
 
 
-app.delete("/deleteUser",async (req,res)=>{
+
+ app.post("/signup",async (req,res)=>{
+  const data=req.body
+  console.log(data)
   try{
-   const id=req.body._id
-   console.log(id)
-   const user=await User.findByIdAndDelete(id)
-    res.send(user)
+    const user=new User(data)
+    await user.save()
+    res.send("user added succesfullly")
   }
-  catch{
-res.send("something wrong")
-  }
+catch{
+  res.send("something went wrong")
 }
-
- )
-
- app.patch("/update",async (req,res)=>{
-  try{
-  const id=req.body._id;
-  const data=req.body;
-  const user=await User.findByIdAndUpdate(id,data)  
-  //                                             ,option ={returnDocument:"after"}
-  res.send(user)
-  }
-  catch{
-    res.send("something wrong")
-  }
-
  })
+ app.patch("/signup",async (req,res)=>{
+  const data=req.body
+  const user=await User.findOneAndUpdate({firstName:"Kalakar"},data,{runValidators:true})
+  res.send("done")
+ })
+
+  
 connectDB().then(()=>{
   app.listen(7777)
 }).catch((err)=>{
