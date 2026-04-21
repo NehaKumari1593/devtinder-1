@@ -4,10 +4,43 @@ const  connectDB=require("./config/database.js")
 const { connect } = require("mongoose")
 const {validateUserData}=require("./utils/validator.js")
 const bcrypt=require("bcrypt")
-
+const validator=require("validator") 
 const app=express()
 app.use(express.json())
 
+
+
+ app.post("/login",async (req,res)=>{
+  try{
+    const {
+    email,password
+    }=req.body
+    if(!email)
+    {
+      throw new Error("enter  email")
+    }
+    
+  
+       //validate function
+
+let user=await User.findOne({email:email})
+if(!user)
+{
+  throw new Error("eamil invalid crediability")
+}
+const isMAtched=await bcrypt.compare(password,user.password)
+if(!isMAtched)
+{
+  throw new Error(" pass invalid crediability")
+}
+   
+    
+    res.send("user login succesfullly")
+  }
+catch(err){
+  res.send(err.message)
+}
+ })
 
 
  app.post("/signup",async (req,res)=>{
@@ -15,20 +48,25 @@ app.use(express.json())
     const {
     firstName,lastName,email,password
     }=req.body
-    validateUserData(req.body)           //validate function
+    if(!email)
+    {
+      throw new Error("enter  email")
+    }
+    
+  let hashPassword=await bcrypt.hash(password,10)
+       //validate function
 
+let user=new User({
+  firstName,
+  lastName,
+  email,
+  password:hashPassword
 
-    //encrpt logic
-   const hashPassword=await bcrypt.hash(password,10)
-
-    const user=new User({
-      firstName,
-      lastName,
-      email,
-      password:hashPassword
-    })
-    await user.save()
-    res.send("user added succesfullly")
+})
+ await user.save()
+   
+    
+    res.send("user signup succesfullly")
   }
 catch(err){
   res.send(err.message)
@@ -37,29 +75,8 @@ catch(err){
 
 
 
-//patch logic
 
- app.patch("/signup",async (req,res)=>{
-  const data=req?.body
-  const allowUpdate=["skill","age","gender","password","photoUrl"]
-  const isUpdateAllow=Object.keys(data).every((k)=>allowUpdate.includes(k))
-  const skill=req?.body?.skill
-  if(skill.length>10)
-  {
-    throw new Error("skill length is too long")
-  }
-  if(!isUpdateAllow)
-  {
-    throw new Error(" this update nopt allowed")
-  }
-  try{
-  const user=await User.findOneAndUpdate({firstName:"richa"},data,{runValidators:true})
-  res.send("updated ")
-  }
-  catch(err){
-    res.send(err.message)
-  }
- })
+ 
 
   
 connectDB().then(()=>{
