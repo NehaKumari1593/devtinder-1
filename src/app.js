@@ -8,6 +8,7 @@ const bcrypt=require("bcrypt")
 const validator=require("validator") 
 const cookieParser=require("cookie-parser")
 const jwt =require("jsonwebtoken")
+const {userAuth}=require("./middlewares.js/auth.js")
 app.use(express.json())
 app.use(cookieParser())
 
@@ -42,6 +43,9 @@ catch(err){
  })
 
 
+
+
+
  app.post("/login",async (req,res)=>{
   try{
     const {
@@ -51,8 +55,6 @@ catch(err){
     {
       throw new Error("enter  email")
     }
-    
-  
        //validate function
 
 let user=await User.findOne({email:email})
@@ -66,13 +68,12 @@ if(isMAtched)
   //res.cookie(name,value)
 //  res.cookie("token","jncjcnxjcnjncjdnjcnjdncjdbvhvhjvjc")
 
-const token=await jwt.sign({id:user._id},"dev@tinder")
-res.cookie("token",token)
+const token=await jwt.sign({id:user._id},"dev@tinder",{expiresIn:'20sec'})
+res.cookie("token",token,{
+    expires: new Date(Date.now() + 8 * 3600000) })// cookie will be removed after 8 hours)
 
  
 }
-   
-    
     res.send("user login succesfullly")
   }
 catch(err){
@@ -80,14 +81,15 @@ catch(err){
 }
  })
 
-app.get("/profile",async (req,res)=>{
-  const cookies=req.cookies
-  const {token}=cookies
-  const decodeMessage=await jwt.verify(token,"dev@tinder")
-  const {id}=decodeMessage
-  
- const user=await User.findById(id)
-  res.send(user)
+
+
+
+app.get("/profile",userAuth,async (req,res)=>{
+  res.send(req.user)
+})
+
+app.get("/sendRequest",userAuth,async(req,res)=>{
+  res.send(req.user.firstName+"send request ")
 })
  
 
