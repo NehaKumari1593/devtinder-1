@@ -2,7 +2,8 @@ const express=require("express")
 const User= require("./models/user.js")
 const  connectDB=require("./config/database.js")
 const { connect } = require("mongoose")
-
+const {validateUserData}=require("./utils/validator.js")
+const bcrypt=require("bcrypt")
 
 const app=express()
 app.use(express.json())
@@ -10,25 +11,33 @@ app.use(express.json())
 
 
  app.post("/signup",async (req,res)=>{
-  const data=req.body
-    const password=req.body.password
-    if(password.length<8)
-    {
-      throw new Error("plz enter password greater than 8 words")
-    }
-    
-  console.log(data)
   try{
-    const user=new User(data)
+    const {
+    firstName,lastName,email,password
+    }=req.body
+    validateUserData(req.body)           //validate function
+
+
+    //encrpt logic
+   const hashPassword=await bcrypt.hash(password,10)
+
+    const user=new User({
+      firstName,
+      lastName,
+      email,
+      password:hashPassword
+    })
     await user.save()
     res.send("user added succesfullly")
   }
-catch{
-  res.send("something went wrong")
+catch(err){
+  res.send(err.message)
 }
  })
 
 
+
+//patch logic
 
  app.patch("/signup",async (req,res)=>{
   const data=req?.body
@@ -47,8 +56,8 @@ catch{
   const user=await User.findOneAndUpdate({firstName:"richa"},data,{runValidators:true})
   res.send("updated ")
   }
-  catch{
-    res.send("something went wrong")
+  catch(err){
+    res.send(err.message)
   }
  })
 
