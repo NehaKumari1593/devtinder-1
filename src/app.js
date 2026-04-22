@@ -62,13 +62,13 @@ if(!user)
 {
   throw new Error("eamil invalid crediability")
 }
-const isMAtched=await bcrypt.compare(password,user.password)
+const isMAtched=await user.bcrypt(password)
 if(isMAtched)
 {
   //res.cookie(name,value)
 //  res.cookie("token","jncjcnxjcnjncjdnjcnjdncjdbvhvhjvjc")
 
-const token=await jwt.sign({id:user._id},"dev@tinder",{expiresIn:'20sec'})
+const token=await user.getJWT()    //user call this mthat why this -user n that function
 res.cookie("token",token,{
     expires: new Date(Date.now() + 8 * 3600000) })// cookie will be removed after 8 hours)
 
